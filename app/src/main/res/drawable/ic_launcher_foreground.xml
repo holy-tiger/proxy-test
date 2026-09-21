@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:translateX="0"
+        android:translateY="0">
+        <!-- Shield base with subtle cyan glow -->
+        <path
+            android:pathData="M54,22 C64,22 75,27 75,37 C75,56 61,71 54,78 C47,71 33,56 33,37 C33,27 44,22 54,22 Z"
+            android:strokeWidth="2.5"
+            android:strokeColor="#38BDF8">
+            <aapt:attr name="android:fillColor">
+                <gradient
+                    android:startX="54"
+                    android:startY="22"
+                    android:endX="54"
+                    android:endY="78"
+                    android:type="linear">
+                    <item android:offset="0.0" android:color="#330284C7" />
+                    <item android:offset="1.0" android:color="#1A0369A1" />
+                </gradient>
+            </aapt:attr>
+        </path>
+
+        <!-- Proxy bidirectional transfer arrows -->
+        <!-- Right-pointing forward arrow -->
+        <path
+            android:pathData="M44,43 L60,43 M55,38 L60,43 L55,48"
+            android:strokeWidth="3.2"
+            android:strokeColor="#38BDF8"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round" />
+
+        <!-- Left-pointing return arrow -->
+        <path
+            android:pathData="M64,55 L48,55 M53,50 L48,55 L53,60"
+            android:strokeWidth="3.2"
+            android:strokeColor="#A5F3FC"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round" />
+
+        <!-- Node dots representing DNS endpoints -->
+        <path
+            android:pathData="M54,32m-3,0a3,3 0 1,0 6,0a3,3 0 1,0 -6,0"
+            android:fillColor="#F0F9FF" />
+        <path
+            android:pathData="M54,67m-2.5,0a2.5,2.5 0 1,0 5,0a2.5,2.5 0 1,0 -5,0"
+            android:fillColor="#38BDF8" />
+    </group>
+</vector>

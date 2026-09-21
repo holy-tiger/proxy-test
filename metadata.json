@@ -1,0 +1,6 @@
+{
+  "name": "DNS Proxy",
+  "description": "内置本地代理服务器与自定义DNS解析，支持原生请求与WebView防DNS污染",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
