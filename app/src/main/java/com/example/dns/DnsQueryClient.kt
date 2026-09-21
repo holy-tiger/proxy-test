@@ -108,26 +108,16 @@ class DnsQueryClient(
             Log.w(TAG, "UDP DNS query failed for $cleanDomain via $dnsServerIp: ${e.message}")
         }
 
-        // If UDP failed and DoH wasn't explicitly tried yet, try DoH fallback if available
-        if (!useDoh && (dnsServerIp == "1.1.1.1" || dnsServerIp == "8.8.8.8" || dnsServerIp == "9.9.9.9" || dnsServerIp == "223.5.5.5")) {
-            val dohFallback = queryDoh(cleanDomain, dnsServerIp)
-            if (dohFallback.ips.isNotEmpty()) {
-                if (useCache) {
-                    cache.put(cleanDomain, dohFallback.ips, dohFallback.ttlSeconds, dnsServerIp)
-                }
-                return dohFallback
-            }
-        }
-
+        // Strict protocol adherence: Never fallback to HTTP/DoH if user did not enable useDoh
         val latency = System.currentTimeMillis() - startTime
         return DnsResolutionResult(
             domain = cleanDomain,
             ips = emptyList(),
-            dnsServer = dnsServerIp,
+            dnsServer = "$dnsServerIp:$dnsServerPort",
             latencyMs = latency,
             fromCache = false,
-            protocol = "Failed",
-            errorMessage = "No A records returned from $dnsServerIp"
+            protocol = if (useDoh) "DoH-Failed" else "UDP-Failed",
+            errorMessage = if (useDoh) "DoH query failed for $cleanDomain" else "UDP 53 query timeout or blocked via $dnsServerIp:$dnsServerPort"
         )
     }
 
