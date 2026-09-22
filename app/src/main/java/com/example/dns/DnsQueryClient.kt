@@ -74,7 +74,7 @@ class DnsQueryClient(
 
         val startTime = System.currentTimeMillis()
 
-        // If DoH is requested or preferred
+        // If DoH is requested, try DoH first
         if (useDoh) {
             val dohResult = queryDoh(cleanDomain, dnsServerIp)
             if (dohResult.ips.isNotEmpty()) {
@@ -83,9 +83,10 @@ class DnsQueryClient(
                 }
                 return dohResult
             }
+            Log.w(TAG, "DoH failed for $cleanDomain via $dnsServerIp, falling back to standard UDP 53")
         }
 
-        // Try direct UDP DNS on port 53
+        // Try direct UDP DNS on port 53 (RFC 1035)
         try {
             val udpResult = queryUdp(cleanDomain, dnsServerIp, dnsServerPort)
             val latency = System.currentTimeMillis() - startTime
@@ -108,7 +109,6 @@ class DnsQueryClient(
             Log.w(TAG, "UDP DNS query failed for $cleanDomain via $dnsServerIp: ${e.message}")
         }
 
-        // Strict protocol adherence: Never fallback to HTTP/DoH if user did not enable useDoh
         val latency = System.currentTimeMillis() - startTime
         return DnsResolutionResult(
             domain = cleanDomain,
@@ -116,8 +116,8 @@ class DnsQueryClient(
             dnsServer = "$dnsServerIp:$dnsServerPort",
             latencyMs = latency,
             fromCache = false,
-            protocol = if (useDoh) "DoH-Failed" else "UDP-Failed",
-            errorMessage = if (useDoh) "DoH query failed for $cleanDomain" else "UDP 53 query timeout or blocked via $dnsServerIp:$dnsServerPort"
+            protocol = if (useDoh) "DoH+UDP-Failed" else "UDP-Failed",
+            errorMessage = "No A records returned from $dnsServerIp:$dnsServerPort (timeout or blocked)"
         )
     }
 

@@ -228,26 +228,34 @@ fun DashboardScreen(
                     Spacer(modifier = Modifier.height(12.dp))
 
                     // Options & Toggles
+                    val currentPreset = DnsServerPreset.PRESETS.find { it.id == uiState.selectedPresetId }
+                    val isDohSupported = currentPreset?.dohUrl != null || uiState.selectedPresetId == "custom"
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Column {
+                        Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
                             Text(
                                 text = "DNS over HTTPS (DoH)",
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.Medium
                             )
                             Text(
-                                text = "使用直接 IP 的 HTTPS 加密通道解析 (抗 UDP 封锁)",
+                                text = if (isDohSupported) {
+                                    "使用直接 IP 的 HTTPS 加密通道解析 (抗 UDP 封锁)"
+                                } else {
+                                    "当前 DNS (${currentPreset?.name ?: uiState.customDnsIp}) 不支持 DoH，自动使用标准 UDP 53"
+                                },
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = if (isDohSupported) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.error
                             )
                         }
                         Switch(
-                            checked = uiState.useDoh,
+                            checked = uiState.useDoh && isDohSupported,
                             onCheckedChange = { viewModel.toggleDoh(it) },
+                            enabled = isDohSupported,
                             modifier = Modifier.testTag("doh_switch")
                         )
                     }

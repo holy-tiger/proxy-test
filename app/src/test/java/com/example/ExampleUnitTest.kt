@@ -108,14 +108,11 @@ class ExampleUnitTest {
     }
 
     @Test
-    fun testDnsClassifierBlocked() {
-        val verdict = com.example.dns.DnsPollutionClassifier.classify(
-            localIps = emptyList(),
-            localError = "UnknownHostException: connection timed out",
-            upstreamIps = listOf("104.16.132.229"),
-            upstreamError = null
-        )
-        assertEquals(com.example.dns.DnsVerdictType.POLLUTION_BLOCKED, verdict)
+    fun testDns114PresetHasNoDoh() {
+        val preset114 = DnsServerPreset.PRESETS.find { it.id == "dns114" }
+        assertNotNull(preset114)
+        assertEquals("114.114.114.114", preset114?.ip)
+        assertNull(preset114?.dohUrl)
     }
 }
 

@@ -131,7 +131,8 @@ class ProxyViewModel(application: Application) : AndroidViewModel(application) {
                 selectedPresetId = preset.id,
                 customDnsIp = preset.ip,
                 customDnsPort = preset.port,
-                useDoh = if (preset.dohUrl != null && it.useDoh) true else it.useDoh
+                // Only keep useDoh enabled if the target preset actually supports DoH; otherwise automatically switch to false
+                useDoh = if (preset.dohUrl != null) it.useDoh else false
             )
         }
         if (proxyStats.value.isRunning) {
