@@ -489,36 +489,60 @@ fun BrowserScreen(
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = "当前 DNS: ${stats.dnsServerIp} (端口 ${stats.port})",
+                                    text = "上游 DNS: ${stats.dnsServerIp}:53 (${if (uiState.useDoh) "DoH 443 加密" else "标准 UDP 53"})",
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.SemiBold,
                                     color = MaterialTheme.colorScheme.primary
                                 )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = "本地代理隧道: 127.0.0.1:${stats.port}",
+                                    fontSize = 10.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                if (!uiState.useDoh && (stats.dnsServerIp == "1.1.1.1" || stats.dnsServerIp == "8.8.8.8")) {
+                                    Spacer(modifier = Modifier.height(6.dp))
+                                    Text(
+                                        text = "⚠️ 提示: ${stats.dnsServerIp} 的 UDP 53 端口通常被国内防火墙封锁，请开启 DoH 以抗封锁解析。",
+                                        fontSize = 10.sp,
+                                        color = MaterialTheme.colorScheme.error
+                                    )
+                                }
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(20.dp))
 
                         Row(
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
+                            if (!uiState.useDoh) {
+                                Button(
+                                    onClick = {
+                                        viewModel.toggleDoh(true)
+                                        pageError = null
+                                        webViewInstance?.loadUrl(failedUrl.ifBlank { currentUrl })
+                                    }
+                                ) {
+                                    Text("开启 DoH 重试", fontSize = 12.sp)
+                                }
+                            }
+
                             OutlinedButton(
                                 onClick = {
-                                    // Reset DNS to default 1.1.1.1 (Cloudflare)
-                                    val cloudflarePreset = com.example.dns.DnsServerPreset.PRESETS.firstOrNull { it.id == "cloudflare" }
-                                    if (cloudflarePreset != null) {
-                                        viewModel.selectPreset(cloudflarePreset)
-                                    } else {
-                                        viewModel.setCustomDns("1.1.1.1", 53)
+                                    // Switch to AliDNS (223.5.5.5) which works well on domestic networks
+                                    val aliPreset = com.example.dns.DnsServerPreset.PRESETS.firstOrNull { it.id == "alidns" }
+                                    if (aliPreset != null) {
+                                        viewModel.selectPreset(aliPreset)
                                     }
                                     pageError = null
                                     webViewInstance?.loadUrl(failedUrl.ifBlank { currentUrl })
                                 }
                             ) {
-                                Text("一键重置为 1.1.1.1", fontSize = 12.sp)
+                                Text("切换为阿里 DNS", fontSize = 12.sp)
                             }
 
-                            Button(
+                            OutlinedButton(
                                 onClick = {
                                     pageError = null
                                     webViewInstance?.loadUrl(failedUrl.ifBlank { currentUrl })

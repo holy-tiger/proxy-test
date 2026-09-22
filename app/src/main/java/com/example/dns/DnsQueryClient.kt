@@ -109,6 +109,18 @@ class DnsQueryClient(
             Log.w(TAG, "UDP DNS query failed for $cleanDomain via $dnsServerIp: ${e.message}")
         }
 
+        // Smart Fallback: If UDP 53 failed/timed out, and the server supports DoH (e.g. AliDNS, Cloudflare, Google), try DoH fallback
+        if (!useDoh && (dnsServerIp == "223.5.5.5" || dnsServerIp == "1.1.1.1" || dnsServerIp == "8.8.8.8" || dnsServerIp == "9.9.9.9")) {
+            Log.i(TAG, "UDP 53 failed or timed out for $cleanDomain via $dnsServerIp, attempting DoH fallback...")
+            val dohFallback = queryDoh(cleanDomain, dnsServerIp)
+            if (dohFallback.ips.isNotEmpty()) {
+                if (useCache) {
+                    cache.put(cleanDomain, dohFallback.ips, dohFallback.ttlSeconds, dnsServerIp)
+                }
+                return dohFallback.copy(protocol = "DoH-Fallback")
+            }
+        }
+
         val latency = System.currentTimeMillis() - startTime
         return DnsResolutionResult(
             domain = cleanDomain,
