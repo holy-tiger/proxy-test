@@ -205,8 +205,8 @@ class LocalProxyServer(
                         targetHost = host,
                         targetPort = port,
                         resolvedIp = "None",
-                        dnsServerUsed = config.dnsServerIp,
-                        status = "502 Bad Gateway (DNS Failed)",
+                        dnsServerUsed = "${config.dnsServerIp}:${config.dnsServerPort} (${dnsResult.protocol})",
+                        status = "502 DNS Failed: ${dnsResult.errorMessage ?: "无解析结果"}",
                         latencyMs = System.currentTimeMillis() - startTime,
                         protocol = "HTTPS Tunnel"
                     )
@@ -299,8 +299,8 @@ class LocalProxyServer(
                         targetHost = host,
                         targetPort = port,
                         resolvedIp = "None",
-                        dnsServerUsed = config.dnsServerIp,
-                        status = "502 Bad Gateway (DNS Failed)",
+                        dnsServerUsed = "${config.dnsServerIp}:${config.dnsServerPort} (${dnsResult.protocol})",
+                        status = "502 DNS Failed: ${dnsResult.errorMessage ?: "无解析结果"}",
                         latencyMs = System.currentTimeMillis() - startTime,
                         protocol = "HTTP"
                     )
